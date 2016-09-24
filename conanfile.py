@@ -56,7 +56,7 @@ class BotanConan(ConanFile):
         self.output.info('Building %s' % self.name)
         self.run('cd botan && %s make %s -j$(nproc) 2>&1' % (make_ldflags, quiet_option))
         self.output.info('Running %s self-test' % self.name)
-        self.run('cd botan && ./botan-test --threads=$(nproc) >/dev/null')
+        self.run('cd botan && ./botan-test')
 
     def package(self):
         self.run('cd botan && make install')
