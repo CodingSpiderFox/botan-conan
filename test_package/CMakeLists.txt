@@ -1,0 +1,9 @@
+project(BotanTest)
+cmake_minimum_required(VERSION 2.8.12)
+
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
+add_definitions(-std=c++11)
+add_executable(botan_test main.cpp)
+target_link_libraries(botan_test ${CONAN_LIBS})
