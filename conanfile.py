@@ -174,11 +174,11 @@ class BotanConan(ConanFile):
         self.run('cd botan && ./botan-test')
 
     def package_info(self):
-        self.cpp_info.libs = [
-            'botan-2',
-            'dl',
-            'rt'
-        ]
+        self.cpp_info.libs = ['botan-2', 'dl']
+        if self.settings.os == 'Linux':
+            self.cpp_info.libs.append('rt')
+        if not self.options.shared:
+            self.cpp_info.libs.append('pthread')
         self.cpp_info.libdirs = [
             'lib'
         ]
