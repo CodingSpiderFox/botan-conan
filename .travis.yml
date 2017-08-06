@@ -5,7 +5,7 @@ env:
      - CONAN_USERNAME: "fmorgner"
      - CONAN_LOGIN_USERNAME: "fmorgner"
      - CONAN_CHANNEL: "stable"
-     - CONAN_UPLOAD: "https://api.bintray.com/fmorgner/conan-fmorgner"
+     - CONAN_UPLOAD: "https://api.bintray.com/conan/fmorgner/conan-fmorgner"
      - CONAN_TOTAL_PAGES: 2
 
 linux: &linux
