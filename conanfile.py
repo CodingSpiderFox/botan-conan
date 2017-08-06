@@ -171,8 +171,6 @@ class BotanConan(ConanFile):
         self.run(('cd botan &&'
                   ' make install'))
 
-        self.run('cd botan && ./botan-test')
-
     def package_info(self):
         self.cpp_info.libs = ['botan-2', 'dl']
         if self.settings.os == 'Linux':
