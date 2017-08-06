@@ -1,18 +1,28 @@
-from conans import ConanFile, CMake
+# pylint: disable=missing-docstring
+
 import os
+from conans import ConanFile, CMake
 
-username = os.getenv('CONAN_USERNAME', 'fmorgner')
-channel = os.getenv('CONAN_CHANNEL', 'testing')
+CHAN = os.getenv('CONAN_CHANNEL', 'testing')
+USER = os.getenv('CONAN_USERNAME', 'fmorgner')
 
-class BotanUseConan(ConanFile):
-    settings = 'os', 'compiler', 'build_type', 'arch'
-    requires = 'Botan/1.11.31@%s/%s' % (username, channel)
-    generators = 'cmake'
+
+class PackageTest(ConanFile):
+    settings = (
+        'arch',
+        'build_type',
+        'compiler',
+        'os',
+    )
+    generators = [
+        'cmake',
+    ]
 
     def build(self):
-        cmake = CMake(self.settings)
-        self.run('cmake "%s" %s' % (self.conanfile_directory, cmake.command_line))
-        self.run('cmake --build . %s' % cmake.build_config)
+        cmake = CMake(self)
+        cmake.configure(source_dir=self.conanfile_directory)
+        cmake.build()
 
     def test(self):
-        self.run(os.sep.join(['.', 'bin', 'botan_test']))
+        os.chdir('bin')
+        self.run(os.sep.join(['.', 'package_test']))

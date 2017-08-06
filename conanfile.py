@@ -1,68 +1,194 @@
+# pylint: disable=missing-docstring,invalid-name
 from conans import ConanFile
-from re import search
+
 
 class BotanConan(ConanFile):
+    """
+    The conan.io package of the Botan C++ TLS library
+    """
     name = 'Botan'
-    version = '1.11.31'
-    settings = {
-        'os': ['Linux'],
-        'arch': None,
-        'compiler': None,
-        'build_type': None
-    }
+    version = '2.1.0'
+    description = (
+        'Botan seeks to be a broadly applicable library that can be used to'
+        'implement a range of secure distributed systems.'
+    )
+    settings = (
+        'os',
+        'arch',
+        'compiler',
+        'build_type'
+    )
     options = {
+        'amalgamation': [True, False],
+        'bzip2': [True, False],
+        'debug_info': [True, False],
+        'openssl': [True, False],
+        'quiet':   [True, False],
         'shared': [True, False],
-        'quiet': [True, False],
+        'single_amalgamation': [True, False],
+        'sqlite3': [True, False],
+        'zlib': [True, False],
     }
-    default_options = 'shared=True\nquiet=True'
+    default_options = (
+        'amalgamation=True',
+        'bzip2=False',
+        'debug_info=False',
+        'openssl=False',
+        'quiet=True',
+        'shared=True',
+        'single_amalgamation=False',
+        'sqlite3=False',
+        'zlib=False',
+    )
     url = 'https://github.com/fmorgner/botan-conan.git'
-    license = 'Simplified BSD'
-
-    def _get_major_and_minor(self):
-        return search('(?P<major_minor>[0-9]+\.[0-9]+)\.*', self.version).group('major_minor')
+    source_url = 'https://github.com/randombit/botan.git'
+    license = 'BSD 2-clause'
 
     def source(self):
         self.run('git clone https://github.com/randombit/botan.git')
         self.run('cd botan && git checkout %s' % self.version)
 
+    # pylint: disable=too-many-locals
     def build(self):
-        if self.settings.compiler in ('clang', 'apple-clang'):
-            compiler_option = 'clang'
-        elif self.settings.compiler == 'gcc':
-            compiler_option = 'gcc'
-        else:
-            compiler_option = 'msvc'
+        conan_arch = self.settings.arch
+        conan_compiler = self.settings.compiler
+        conan_os = self.settings.os
+        conan_libcxx = conan_compiler.libcxx
+        conan_build_type = self.settings.build_type
 
-        if self.settings.arch == 'x86':
-            cpu_option = 'x86'
+        if conan_compiler in ('clang', 'apple-clang'):
+            botan_compiler = 'clang'
+        elif conan_compiler == 'gcc':
+            botan_compiler = 'gcc'
         else:
-            cpu_option = 'x86_64'
+            botan_compiler = 'msvc'
 
-        if self.settings.os == 'Linux' and self.settings.compiler.libcxx == 'libc++':
+        if conan_arch == 'x86':
+            botan_cpu = 'x86'
+        else:
+            botan_cpu = 'x86_64'
+
+        is_linux_clang_libcxx = (
+            conan_os == 'Linux' and
+            conan_compiler == 'clang' and
+            conan_libcxx == 'libc++'
+        )
+
+        if is_linux_clang_libcxx:
             make_ldflags = 'LDFLAGS=-lc++abi'
         else:
             make_ldflags = ''
 
-        shared_option = '' if self.options.shared else '--disable-shared'
-        quiet_option = '--quiet' if self.options.quiet else ''
-        self.output.info('Configuring %s' % self.name)
-        self.run('cd botan && ./configure.py --prefix fakeroot --cc={compiler} --cpu={cpu} --cc-abi-flags="{abi}" {shared} {quiet}'.format(**{
-            'compiler': compiler_option,
-            'quiet': quiet_option,
-            'shared': shared_option,
-            'cpu': cpu_option,
-            'abi': '-stdlib=%s' % self.settings.compiler.libcxx,
-        }))
-        self.output.info('Building %s' % self.name)
-        self.run('cd botan && %s make %s -j$(nproc) 2>&1' % (make_ldflags, quiet_option))
-        self.output.info('Running %s self-test' % self.name)
+        botan_abi = (
+            '-stdlib=libc++ -lc++abi' if is_linux_clang_libcxx
+            else ''
+        )
+        botan_amalgamation = (
+            '--amalgamation' if self.options.amalgamation
+            else ''
+        )
+        botan_bzip2 = (
+            '--with-bzip2' if self.options.bzip2
+            else ''
+        )
+        botan_debug_info = (
+            '--with-debug-info' if self.options.debug_info
+            else ''
+        )
+        botan_debug_mode = (
+            '--debug-mode' if str(conan_build_type).lower() == 'debug'
+            else ''
+        )
+        botan_openssl = (
+            '--with-openssl' if self.options.openssl
+            else ''
+        )
+        botan_quiet = (
+            '--quiet' if self.options.quiet
+            else ''
+        )
+        botan_shared = (
+            '' if self.options.shared
+            else '--disable-shared'
+        )
+        botan_single_amalgamation = (
+            '--single-amalgamation-file' if self.options.single_amalgamation
+            else ''
+        )
+        botan_sqlite3 = (
+            '--with-sqlite3' if self.options.sqlite3
+            else ''
+        )
+        botan_zlib = (
+            '--with-zlib' if self.options.zlib
+            else ''
+        )
+
+        self.run(('cd botan &&'
+                  ' ./configure.py'
+                  ' --cc-abi-flags="{abi}"'
+                  ' --cc={compiler}'
+                  ' --cpu={cpu}'
+                  ' --distribution-info="Conan"'
+                  ' --prefix={prefix}'
+                  ' {amalgamation}'
+                  ' {bzip2}'
+                  ' {debug_info}'
+                  ' {debug_mode}'
+                  ' {openssl}'
+                  ' {quiet}'
+                  ' {shared}'
+                  ' {sqlite3}'
+                  ' {zlib}').format(**{
+                      'abi': botan_abi,
+                      'amalgamation': botan_amalgamation,
+                      'bzip2': botan_bzip2,
+                      'compiler': botan_compiler,
+                      'cpu': botan_cpu,
+                      'debug_info': botan_debug_info,
+                      'debug_mode': botan_debug_mode,
+                      'openssl': botan_openssl,
+                      'prefix': self.package_folder,
+                      'quiet': botan_quiet,
+                      'shared': botan_shared,
+                      'single_amalgamation': botan_single_amalgamation,
+                      'sqlite3': botan_sqlite3,
+                      'zlib': botan_zlib,
+                  }))
+
+        self.run(('cd botan &&'
+                  ' {ldflags}'
+                  ' make'
+                  ' {quiet}'
+                  ' -j$(nproc) 2>&1').format(**{
+                      'ldflags': make_ldflags,
+                      'quiet': botan_quiet,
+                  }))
+
+        self.run(('cd botan &&'
+                  ' make install'))
+
         self.run('cd botan && ./botan-test')
 
-    def package(self):
-        self.run('cd botan && make install')
-        self.copy('*.h', src='botan/fakeroot/include/botan-1.11', dst='include')
-        self.copy('*.a', src='botan/fakeroot/lib', dst='lib', keep_path=False)
-        self.copy('*.so*', src='botan/fakeroot/lib', dst='lib', keep_path=False)
-
     def package_info(self):
-        self.cpp_info.libs = ['botan-%s' % self._get_major_and_minor()]
+        self.cpp_info.libs = [
+            'botan-2',
+            'dl',
+            'rt'
+        ]
+        self.cpp_info.libdirs = [
+            'lib'
+        ]
+        self.cpp_info.includedirs = [
+            'include/botan-2'
+        ]
+
+    def requirements(self):
+        if self.options.bzip2:
+            self.requires('bzip2/[>=1.0]@lasote/stable')
+        if self.options.openssl:
+            self.requires('openssl/[>=1.1]@hoxnox/testing')
+        if self.options.zlib:
+            self.requires('zlib/[>=1.2]@lasote/stable')
+        if self.options.sqlite3:
+            self.requires('sqlite3/[>=3.18]@jgsogo/stable')
