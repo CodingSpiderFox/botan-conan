@@ -1,4 +1,5 @@
 # pylint: disable=missing-docstring,invalid-name
+from multiprocessing import cpu_count
 from conans import ConanFile
 
 
@@ -163,7 +164,8 @@ class BotanConan(ConanFile):
                   ' {ldflags}'
                   ' make'
                   ' {quiet}'
-                  ' -j$(nproc) 2>&1').format(**{
+                  ' -j{cpucount} 1>&1').format(**{
+                      'cpucount': cpu_count(),
                       'ldflags': make_ldflags,
                       'quiet': botan_quiet,
                   }))
