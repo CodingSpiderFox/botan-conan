@@ -6,6 +6,7 @@ env:
      - CONAN_LOGIN_USERNAME: "fmorgner"
      - CONAN_CHANNEL: "stable"
      - CONAN_UPLOAD: "https://api.bintray.com/conan/fmorgner/conan-fmorgner"
+     - CONAN_TOTAL_PAGES: 2
 
 linux: &linux
    os: linux
@@ -21,21 +22,37 @@ matrix:
    include:
 
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=4.9 CONAN_DOCKER_IMAGE=lasote/conangcc49
+        env: CONAN_GCC_VERSIONS=4.9 CONAN_DOCKER_IMAGE=lasote/conangcc49 CONAN_CURRENT_PAGE="Release"
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=5.2 CONAN_DOCKER_IMAGE=lasote/conangcc52
+        env: CONAN_GCC_VERSIONS=4.9 CONAN_DOCKER_IMAGE=lasote/conangcc49 CONAN_CURRENT_PAGE="Debug"
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=5.3 CONAN_DOCKER_IMAGE=lasote/conangcc53
+        env: CONAN_GCC_VERSIONS=5.2 CONAN_DOCKER_IMAGE=lasote/conangcc52 CONAN_CURRENT_PAGE="Release"
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=5.4 CONAN_DOCKER_IMAGE=lasote/conangcc54
+        env: CONAN_GCC_VERSIONS=5.2 CONAN_DOCKER_IMAGE=lasote/conangcc52 CONAN_CURRENT_PAGE="Debug"
       - <<: *linux
-        env: CONAN_GCC_VERSIONS=6.3 CONAN_DOCKER_IMAGE=lasote/conangcc63
+        env: CONAN_GCC_VERSIONS=5.3 CONAN_DOCKER_IMAGE=lasote/conangcc53 CONAN_CURRENT_PAGE="Release"
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=3.8 CONAN_DOCKER_IMAGE=lasote/conanclang38
+        env: CONAN_GCC_VERSIONS=5.3 CONAN_DOCKER_IMAGE=lasote/conangcc53 CONAN_CURRENT_PAGE="Debug"
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=3.9 CONAN_DOCKER_IMAGE=lasote/conanclang39
+        env: CONAN_GCC_VERSIONS=5.4 CONAN_DOCKER_IMAGE=lasote/conangcc54 CONAN_CURRENT_PAGE="Release"
       - <<: *linux
-        env: CONAN_CLANG_VERSIONS=4.0 CONAN_DOCKER_IMAGE=lasote/conanclang40
+        env: CONAN_GCC_VERSIONS=5.4 CONAN_DOCKER_IMAGE=lasote/conangcc54 CONAN_CURRENT_PAGE="Debug"
+      - <<: *linux
+        env: CONAN_GCC_VERSIONS=6.3 CONAN_DOCKER_IMAGE=lasote/conangcc63 CONAN_CURRENT_PAGE="Release"
+      - <<: *linux
+        env: CONAN_GCC_VERSIONS=6.3 CONAN_DOCKER_IMAGE=lasote/conangcc63 CONAN_CURRENT_PAGE="Debug"
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=3.8 CONAN_DOCKER_IMAGE=lasote/conanclang38 CONAN_CURRENT_PAGE="Release"
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=3.8 CONAN_DOCKER_IMAGE=lasote/conanclang38 CONAN_CURRENT_PAGE="Debug"
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=3.9 CONAN_DOCKER_IMAGE=lasote/conanclang39 CONAN_CURRENT_PAGE="Release"
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=3.9 CONAN_DOCKER_IMAGE=lasote/conanclang39 CONAN_CURRENT_PAGE="Debug"
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=4.0 CONAN_DOCKER_IMAGE=lasote/conanclang40 CONAN_CURRENT_PAGE="Release"
+      - <<: *linux
+        env: CONAN_CLANG_VERSIONS=4.0 CONAN_DOCKER_IMAGE=lasote/conanclang40 CONAN_CURRENT_PAGE="Debug"
 #      - <<: *osx
 #        osx_image: xcode7.3
 #        env: CONAN_APPLE_CLANG_VERSIONS=7.3
