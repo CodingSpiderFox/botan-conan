@@ -79,6 +79,9 @@ class BotanConan(ConanFile):
         else:
             make_ldflags = ''
 
+        if self.options.single_amalgamation:
+            self.options.amalgamation = True
+
         botan_abi = (
             '-stdlib=libc++ -lc++abi' if is_linux_clang_libcxx
             else ''
